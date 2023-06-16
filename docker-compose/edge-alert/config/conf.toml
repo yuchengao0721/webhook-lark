@@ -1,0 +1,3 @@
+[application]
+    name = "边缘告警服务"
+    port = 30000

@@ -1,0 +1,59 @@
+version: '3'
+services:
+  edge-alert-service:
+      container_name: "edge-alert-service"
+      hostname: edge-alert-service
+      restart: always
+      image: nexus.kdznwl.cn/aims-test/component/edge-alert-service:1.0.0.0
+      deploy:
+        replicas: 1
+        resources:
+          limits:
+            cpus: '0.5'
+            memory: 1024M
+          reservations:
+            cpus: '1'
+            memory: 2408M
+      volumes:
+        - ./edge-alert/config/conf.toml:/etc/edge-alert/conf/conf.toml
+        - ./edge-alert/log:/etc/edge-alert/log
+      ports:
+        - "30000:30000"
+      networks:
+        - edge-alert
+
+  logstash:
+      container_name: "logstash"
+      hostname: logstash
+      restart: always
+      image: logstash:8.7.1
+      deploy:
+        replicas: 1
+        update_config:
+          parallelism: 2
+          delay: 10s
+        restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+          window: 120s
+        resources:
+          limits:
+            cpus: '0.5'
+            memory: 1024M
+          reservations:
+            cpus: '1'
+            memory: 2408M
+      volumes:
+        - ./logstash/config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+        - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      ports:
+        - "9600:9600"
+        - "5044:5044"
+      networks:
+        - edge-alert
+      depends_on:
+        - edge-alert-service
+networks:
+  edge-alert:
+    driver: bridge

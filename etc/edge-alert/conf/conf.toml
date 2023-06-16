@@ -1,0 +1,9 @@
+# 全局的慢查询时间阈值
+long_query_time = 10
+[application]
+    name = "边缘告警服务"
+    port = 30000
+
+[alert]
+# 接到慢查询告警之后往前追溯多久，单位分钟
+    minutes = 1
