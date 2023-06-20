@@ -1,0 +1,131 @@
+interval = 15
+## 全局query 每个instance都会执行
+[[queries]]
+    mesurement = "slow_queries"
+    metric_fields = ["count"]
+    label_fields = [ "db","sql_text"]
+    timeout = "3s"
+    request = '''
+    SELECT `SCHEMA_NAME`as 'db',`DIGEST_TEXT` as 'sql_text',`COUNT_STAR` as 'count' FROM performance_schema.events_statements_summary_by_digest  where `QUERY_SAMPLE_TIMER_WAIT` > 10*1000000000000 ORDER BY `LAST_SEEN` DESC
+    '''
+    interval = 30
+
+[[instances]]
+    address = "mysql:3306"
+    username = "root"
+    password = "1234"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    extra_status_metrics = true
+    # extra_innodb_metrics = false
+    # gather_processlist_processes_by_state = false
+    # gather_processlist_processes_by_user = false
+    gather_schema_size = true
+    gather_table_size = true
+    # gather_system_table_size = false
+    gather_slave_status = true
+    max_open_connections = 5
+    interval_times = 1
+    labels = {cluster="n9e", instance="n9e-mysql"}
+
+[[instances]]
+    address = "192.168.44.57:3306"
+    username = "root"
+    password = "root"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    extra_status_metrics = true
+    # extra_innodb_metrics = false
+    # gather_processlist_processes_by_state = false
+    # gather_processlist_processes_by_user = false
+    gather_schema_size = true
+    gather_table_size = true
+    # gather_system_table_size = false
+    gather_slave_status = true
+    max_open_connections = 5
+    interval_times = 1
+    labels = {cluster="wms", instance="wms-mysql"}
+
+[[instances]]
+    address = "192.168.44.119:3306"
+    username = "root"
+    password = "aimstek_mysql"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    extra_status_metrics = true
+    # extra_innodb_metrics = false
+    # gather_processlist_processes_by_state = false
+    # gather_processlist_processes_by_user = false
+    gather_schema_size = true
+    gather_table_size = true
+    # gather_system_table_size = false
+    gather_slave_status = true
+    max_open_connections = 5
+    interval_times = 1
+    labels = {cluster="wlyq", instance="wlyq-mysql"}
+
+[[instances]]
+    address = "192.168.10.221:30020"
+    username = "root"
+    password = "bitnami.aims.com"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    max_open_connections = 5
+    interval_times = 1
+    # 开启下列配置默认不采集常规指标，只采集自定义的query
+    disable_global_status = true
+    disable_global_variables = true
+    disable_innodb_status = true
+    disable_extra_innodb_status = true
+    labels = {cluster="aims-dev-bitnami",instance="bitnami-mysql"  }
+
+
+[[instances]]
+    address = "192.168.10.125:30011"
+    username = "root"
+    password = "pxc.aims.com"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    max_open_connections = 5
+    interval_times = 1
+    # 开启下列配置默认不采集常规指标，只采集自定义的query
+    disable_global_status = true
+    disable_global_variables = true
+    disable_innodb_status = true
+    disable_extra_innodb_status = true
+    labels = { cluster="aims-dev-pxc",instance="pxc-mysql-pxc-db-pxc-0"  }
+[[instances]]
+    address = "192.168.10.125:30012"
+    username = "root"
+    password = "pxc.aims.com"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    max_open_connections = 5
+    interval_times = 1
+    # 开启下列配置默认不采集常规指标，只采集自定义的query
+    disable_global_status = true
+    disable_global_variables = true
+    disable_innodb_status = true
+    disable_extra_innodb_status = true
+    labels = { cluster="aims-dev-pxc",instance="pxc-mysql-pxc-db-pxc-1"  }
+[[instances]]
+    address = "192.168.10.125:30013"
+    username = "root"
+    password = "pxc.aims.com"
+    is_sys_dba = true
+    is_sys_oper = false
+    disable_connection_pool = false
+    max_open_connections = 5
+    interval_times = 1
+    # 开启下列配置默认不采集常规指标，只采集自定义的query
+    disable_global_status = true
+    disable_global_variables = true
+    disable_innodb_status = true
+    disable_extra_innodb_status = true
+    labels = { cluster="aims-dev-pxc",instance="pxc-mysql-pxc-db-pxc-2"  }

@@ -104,7 +104,7 @@ func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
 			if err != nil {
 				log.Error().Msgf("Failed to scan row:%s", err)
 			} else {
-				slow.Instance = tagsMap["instance"]
+				slow.Instance = instance
 				slowList = append(slowList, &slow)
 			}
 		}

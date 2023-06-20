@@ -29,6 +29,7 @@ type FeishuSender struct{}
 // 飞书发送消息
 func (s *FeishuSender) SendMsg(alertData alertmodel.N9eAlert) bool {
 	slowList := GetSlowList(alertData)
+	log.Log().Msgf("查出来的结果是%d", len(slowList))
 	if len(slowList) == 0 {
 		return true
 	}
@@ -61,7 +62,7 @@ func (s *FeishuSender) SendMsg(alertData alertmodel.N9eAlert) bool {
 					SetBody(feishu_card).
 					Post(feishu_url)
 				if err != nil {
-					log.Err(err)
+					log.Error().Msgf("飞书通知异常了: %v", err)
 				}
 				if !resp.IsSuccessState() {
 					log.Error().Msgf("飞书通知失败了: %v", err)

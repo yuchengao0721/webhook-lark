@@ -10,9 +10,7 @@ RUN go mod tidy && go build
 FROM alpine:3
 RUN mkdir -p /etc/edge-alert
 COPY --from=builder /usr/src/edge-alert/edge-alert /usr/bin/
-COPY ./etc/edge-alert/conf/conf.toml /etc/edge-alert/conf/conf.toml
-COPY ./etc/edge-alert/conf/conf.toml /etc/edge-alert/conf/feishu.tpl
-COPY ./etc/edge-alert/conf/mysql.toml /etc/edge-alert/conf/mysql.toml
+COPY ./etc/edge-alert/conf /etc/edge-alert/conf
 RUN chmod u+rw /etc/edge-alert/conf/conf.toml
 EXPOSE 30000
 CMD ["sh", "-c", "edge-alert"]
