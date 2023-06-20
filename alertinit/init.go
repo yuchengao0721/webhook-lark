@@ -2,7 +2,6 @@ package alertinit
 
 import (
 	"edge-alert/alertmodel"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -30,8 +29,7 @@ func loadConfToml() {
 		log.Error().Msgf("加载配置文件错误: %v", err)
 		return
 	}
-	caongJson, _ := json.Marshal(Conf)
-	log.Info().Msgf(fmt.Sprintf("加载配置文件成功:%s", caongJson))
+	log.Info().Any("conf", Conf).Msg("加载配置文件成功")
 }
 func loadMysqlConfToml() {
 	log.Info().Msgf("加载categraf配置文件开始")
@@ -39,8 +37,7 @@ func loadMysqlConfToml() {
 		log.Error().Msgf("加载categraf配置文件错误: %v", err)
 		return
 	}
-	caongJson, _ := json.Marshal(MysqlConf)
-	log.Info().Msgf(fmt.Sprintf("加载categraf配置文件成功:%s", caongJson))
+	log.Info().Any("categraf", MysqlConf).Msg("加载categraf配置文件成功")
 }
 func initZeroLog() {
 	fmt.Println("加载日志文件开始")

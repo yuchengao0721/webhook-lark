@@ -65,7 +65,6 @@ func (s *FeishuSender) SendMsg(alertData alertmodel.N9eAlert) bool {
 				}
 				if !resp.IsSuccessState() {
 					log.Error().Msgf("飞书通知失败了: %v", err)
-					return false
 				}
 			}
 

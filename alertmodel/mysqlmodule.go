@@ -1,7 +1,7 @@
 package alertmodel
 
 type Labels struct {
-	Region   string `toml:"region"`
+	Cluster  string `toml:"cluster"`
 	Instance string `toml:"instance"`
 }
 type Instance struct {

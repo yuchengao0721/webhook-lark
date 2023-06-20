@@ -47,11 +47,11 @@ func InitializeConnectionPools() {
 		if instance.Labels.Instance != "" {
 			db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/performance_schema", instance.Username, instance.Password, instance.Address))
 			if err != nil {
-				log.Error().Msgf("failed to open MySQL connection for instance '%s': %v", instance.Labels.Instance, err)
+				log.Error().Msgf("failed to open MySQL connection for instance '%s': %v", fmt.Sprintf("%s-%s", instance.Labels.Cluster, instance.Labels.Instance), err)
 			}
 			// 设置连接池最大连接数为 5
 			db.SetMaxOpenConns(5)
-			connectionPools.pools[instance.Labels.Instance] = db
+			connectionPools.pools[fmt.Sprintf("%s-%s", instance.Labels.Cluster, instance.Labels.Instance)] = db
 		}
 	}
 	Pool = connectionPools
@@ -68,12 +68,13 @@ func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
 		}
 	}
 	slowList := []*alertmodel.MysqlSlowLog{}
-	_, exists := tagsMap["instance"]
-	//不存在instance的话，就没法找到对应的数据库
-	if !exists {
-		return slowList
-	}
-	conn, err := Pool.GetMySQLConnectionPool(tagsMap["instance"])
+	cluster := tagsMap["cluster"]
+	instance := tagsMap["instance"]
+	// //不存在cluster和instance的话，就没法找到对应的数据库
+	// if !cexists || !iexists {
+	// 	return slowList
+	// }
+	conn, err := Pool.GetMySQLConnectionPool(fmt.Sprintf("%s-%s", cluster, instance))
 	if err != nil {
 		log.Error().Msgf("Failed to get connection:%s", err)
 		return slowList
@@ -84,9 +85,14 @@ func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
 	// 将时间戳转换为中国标准时间
 	tm := time.Unix(data.LastEvalTime, 0).In(cst).Add(-(time.Duration(alertinit.Conf.Alert.Minutes)) * time.Minute)
 	formattedTime := tm.Format("2006-01-02 15:04:05")
-	sql := fmt.Sprintf("SELECT `SCHEMA_NAME` as 'db',`QUERY_SAMPLE_TIMER_WAIT` as 'query_time',`QUERY_SAMPLE_TEXT` as 'query',`LAST_SEEN` as 'last_query_time'FROM events_statements_summary_by_digest  where `QUERY_SAMPLE_TIMER_WAIT` > '%d'*1000000000000 AND `LAST_SEEN` > '%s' ORDER BY LAST_SEEN DESC", alertinit.Conf.LongQueryTime, formattedTime)
-	log.Info().Msgf("sql:%s", sql)
-	log.Info().Msgf("%d", data.LastEvalTime)
+	sql := fmt.Sprintf("SELECT `SCHEMA_NAME` as 'db',`QUERY_SAMPLE_TIMER_WAIT` as 'query_time',`QUERY_SAMPLE_TEXT` as 'query',`LAST_SEEN` as 'last_query_time'FROM events_statements_summary_by_digest  where `QUERY_SAMPLE_TIMER_WAIT` > %d *1000000000000 AND `LAST_SEEN` > '%s' ORDER BY LAST_SEEN DESC", alertinit.Conf.LongQueryTime, formattedTime)
+	logData := map[string]interface{}{
+		"tag":          fmt.Sprintf("%s-%s", cluster, instance),
+		"lastEvalTime": data.LastEvalTime,
+		"tm":           tm,
+		"sql":          sql,
+	}
+	log.Info().Fields(logData).Msg("慢查询信息")
 	rows, err := conn.Query(sql)
 	if err != nil {
 		log.Error().Msgf("Failed to execute query:%s", err)
@@ -94,7 +100,6 @@ func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
 		defer rows.Close()
 		for rows.Next() {
 			var slow alertmodel.MysqlSlowLog
-
 			err := rows.Scan(&slow.Db, &slow.Query_time, &slow.Query, &slow.Last_query_time)
 			if err != nil {
 				log.Error().Msgf("Failed to scan row:%s", err)
@@ -102,7 +107,6 @@ func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
 				slow.Instance = tagsMap["instance"]
 				slowList = append(slowList, &slow)
 			}
-
 		}
 	}
 	return slowList
