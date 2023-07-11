@@ -1,8 +1,7 @@
-**数据库出现{{len .}}个慢查询，详情如下：**
-———————————————————{{range .}}
-**所属实例**: {{.Instance}}
-**数 据 库**: {{.Db}}
-**查询时间**: {{.Last_query_time}} 
-**执行时长**: {{ToSeconds .Query_time}} s
-**执行语句**: {{.Query}}
-———————————————————{{end}}
+**级别状态**:  {{.Labels.Level}}
+**规则名称**: {{.Labels.AlertName}}
+**规则备注**: {{.Annotations.Summary}}
+**实例标签**: {{ "{" }}{{.Metric.Labelstr}}{{ "}" }}
+**触发时间**: {{.StartsTime}}
+**触发时值**: {{.Metric.Value}}
+**查看详情**: [告警平台]({{.HosrUrl}})

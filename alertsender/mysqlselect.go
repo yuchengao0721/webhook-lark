@@ -5,7 +5,6 @@ import (
 	"edge-alert/alertinit"
 	"edge-alert/alertmodel"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -57,20 +56,11 @@ func InitializeConnectionPools() {
 	Pool = connectionPools
 }
 
-func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
-	tagsMap := make(map[string]string)
-	for _, tag := range data.Tags {
-		parts := strings.Split(tag, "=")
-		if len(parts) == 2 {
-			key := parts[0]
-			value := parts[1]
-			tagsMap[key] = value
-		}
-	}
+func GetSlowList(data *alertmodel.Alert) []*alertmodel.MysqlSlowLog {
 	slowList := []*alertmodel.MysqlSlowLog{}
-	cluster := tagsMap["cluster"]
-	instance := tagsMap["instance"]
-	// //不存在cluster和instance的话，就没法找到对应的数据库
+	cluster := data.Metric.Labels["cluster"]
+	instance := data.Metric.Labels["instance"]
+	//不存在cluster和instance的话，就没法找到对应的数据库
 	// if !cexists || !iexists {
 	// 	return slowList
 	// }
@@ -79,16 +69,12 @@ func GetSlowList(data alertmodel.N9eAlert) []*alertmodel.MysqlSlowLog {
 		log.Error().Msgf("Failed to get connection:%s", err)
 		return slowList
 	}
-	cstOffset := 8 * 60 * 60 // 中国标准时间偏移量为+8小时，转换为秒
-	// 使用time.FixedZone创建CST时区
-	cst := time.FixedZone("CST", cstOffset)
-	// 将时间戳转换为中国标准时间
-	tm := time.Unix(data.LastEvalTime, 0).In(cst).Add(-(time.Duration(alertinit.Conf.Alert.Minutes)) * time.Minute)
+	tm := data.StartsAt.Add(-(time.Duration(alertinit.Conf.MysqlSlowQuery.LongQueryTime)) * time.Minute)
 	formattedTime := tm.Format("2006-01-02 15:04:05")
-	sql := fmt.Sprintf("SELECT `SCHEMA_NAME` as 'db',`QUERY_SAMPLE_TIMER_WAIT` as 'query_time',`QUERY_SAMPLE_TEXT` as 'query',`LAST_SEEN` as 'last_query_time'FROM events_statements_summary_by_digest  where `QUERY_SAMPLE_TIMER_WAIT` > %d *1000000000000 AND `LAST_SEEN` > '%s' ORDER BY LAST_SEEN DESC", alertinit.Conf.LongQueryTime, formattedTime)
+	sql := fmt.Sprintf("SELECT `SCHEMA_NAME` as 'db',`QUERY_SAMPLE_TIMER_WAIT` as 'query_time',`QUERY_SAMPLE_TEXT` as 'query',`LAST_SEEN` as 'last_query_time'FROM events_statements_summary_by_digest  where `QUERY_SAMPLE_TIMER_WAIT` > %d *1000000000000 AND `LAST_SEEN` > '%s' ORDER BY LAST_SEEN DESC", alertinit.Conf.MysqlSlowQuery.LongQueryTime, formattedTime)
 	logData := map[string]interface{}{
 		"tag":          fmt.Sprintf("%s-%s", cluster, instance),
-		"lastEvalTime": data.LastEvalTime,
+		"lastEvalTime": data.StartsAt,
 		"tm":           tm,
 		"sql":          sql,
 	}

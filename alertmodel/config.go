@@ -1,26 +1,25 @@
 package alertmodel
 
+// Config type
+type Config struct {
+	Application    Application    `toml:"application"`
+	Alert          AlertToken     `toml:"alert_tokens"`
+	MysqlSlowQuery MysqlSlowQuery `toml:"mysql_slow_query"`
+}
+
 // ApplicationApplication type
 type Application struct {
 	Name string `toml:"name"`
 	Port int    `toml:"port"`
 }
 
+// 慢查询配置
+type MysqlSlowQuery struct {
+	Tag           string `toml:"tag"`
+	LongQueryTime int    `toml:"long_query_time"`
+}
+
 // Alert type
-type Alert struct {
-	Type    []string `toml:"type"`
-	Minutes int      `toml:"minutes"`
-}
-
-// Feishu type
-type Feishu struct {
-	Token []string `toml:"rebot_token"`
-}
-
-// Config type
-type Config struct {
-	Application   Application `toml:"application"`
-	Alert         Alert       `toml:"alert"`
-	Feishu        Feishu      `toml:"feishu"`
-	LongQueryTime int         `toml:"long_query_time"`
+type AlertToken struct {
+	FSToken string `toml:"feishu_rebot_token"`
 }
