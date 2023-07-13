@@ -65,7 +65,7 @@ func (s *FeishuSender) SendMsg(alertData alertmodel.GrafanaAlert) bool {
 			content, _ := create_slow_query_alert_content(slowList)
 			feishu_card = alertmodel.CreateFsCard("🔔  MySQL慢查询告警", content, "S1")
 		} else {
-			content, _ := create_common_alert_content(*al)
+			content, _ := create_common_alert_content(al)
 			if len(content) == 0 {
 				return true
 			}
@@ -93,7 +93,7 @@ func (s *FeishuSender) SendMsg(alertData alertmodel.GrafanaAlert) bool {
 }
 
 // 拼接慢查询通知的消息内容
-func create_slow_query_alert_content(slowList []*alertmodel.MysqlSlowLog) (string, error) {
+func create_slow_query_alert_content(slowList []alertmodel.MysqlSlowLog) (string, error) {
 	log.Log().Msgf("查出来的结果是%d", len(slowList))
 	if len(slowList) == 0 {
 		return "", nil

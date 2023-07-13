@@ -15,8 +15,9 @@ type Application struct {
 
 // 慢查询配置
 type MysqlSlowQuery struct {
-	Tag           string `toml:"tag"`
-	LongQueryTime int    `toml:"long_query_time"`
+	Tag            string `toml:"tag"`
+	LongQueryTime  int    `toml:"long_query_time"`
+	RetrospectTime int    `toml:"retrospect_time"`
 }
 
 // Alert type

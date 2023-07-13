@@ -27,7 +27,7 @@ interval = 15
     gather_slave_status = true
     max_open_connections = 5
     interval_times = 1
-    labels = {cluster="n9e", instance="n9e-mysql"}
+    labels = {namespace="n9e", pod="n9e-mysql"}
 
 [[instances]]
     address = "192.168.44.57:3306"
@@ -46,7 +46,7 @@ interval = 15
     gather_slave_status = true
     max_open_connections = 5
     interval_times = 1
-    labels = {cluster="wms", instance="wms-mysql"}
+    labels = {namespace="wms", instance="wms-mysql"}
 
 [[instances]]
     address = "192.168.44.119:3306"
@@ -65,7 +65,7 @@ interval = 15
     gather_slave_status = true
     max_open_connections = 5
     interval_times = 1
-    labels = {cluster="wlyq", instance="wlyq-mysql"}
+    labels = {namespace="wlyq", instance="wlyq-mysql"}
 
 [[instances]]
     address = "192.168.10.221:30020"
@@ -81,11 +81,11 @@ interval = 15
     disable_global_variables = true
     disable_innodb_status = true
     disable_extra_innodb_status = true
-    labels = {cluster="aims-dev-bitnami",instance="bitnami-mysql"  }
+    labels = {namespace="aims-dev",pod="bitnami-mysql-0"  }
 
 
 [[instances]]
-    address = "192.168.10.125:30011"
+    address = "192.168.10.221:30011"
     username = "root"
     password = "pxc.aims.com"
     is_sys_dba = true
@@ -98,9 +98,9 @@ interval = 15
     disable_global_variables = true
     disable_innodb_status = true
     disable_extra_innodb_status = true
-    labels = { cluster="aims-dev-pxc",instance="pxc-mysql-pxc-db-pxc-0"  }
+    labels = { namespace="aims-dev",pod="pxc-mysql-pxc-db-pxc-0"  }
 [[instances]]
-    address = "192.168.10.125:30012"
+    address = "192.168.10.221:30012"
     username = "root"
     password = "pxc.aims.com"
     is_sys_dba = true
@@ -113,9 +113,9 @@ interval = 15
     disable_global_variables = true
     disable_innodb_status = true
     disable_extra_innodb_status = true
-    labels = { cluster="aims-dev-pxc",instance="pxc-mysql-pxc-db-pxc-1"  }
+    labels = { namespace="aims-dev",pod="pxc-mysql-pxc-db-pxc-1"  }
 [[instances]]
-    address = "192.168.10.125:30013"
+    address = "192.168.10.221:30013"
     username = "root"
     password = "pxc.aims.com"
     is_sys_dba = true
@@ -128,4 +128,4 @@ interval = 15
     disable_global_variables = true
     disable_innodb_status = true
     disable_extra_innodb_status = true
-    labels = { cluster="aims-dev-pxc",instance="pxc-mysql-pxc-db-pxc-2"  }
+    labels = { namespace="aims-dev",pod="pxc-mysql-pxc-db-pxc-2"  }

@@ -13,3 +13,5 @@
     tag = "MSQ"
     # 全局的慢查询时间阈值 单位是秒
     long_query_time = 10
+    # 接到慢查询告警之后，往前追溯多久，单位是秒
+    retrospect_time = 60

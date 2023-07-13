@@ -51,7 +51,9 @@ func parsePrometheusMetric(input string) (PrometheusMetric, error) {
 	metric := PrometheusMetric{
 		Labels: make(map[string]string),
 	}
-
+	if len(input) == 0 {
+		return metric, nil
+	}
 	// 提取labels和value的正则表达式
 	labelsRegex := regexp.MustCompile(`labels={([^}]*)}`)
 	valueRegex := regexp.MustCompile(`value=([\d.]+)`)
@@ -62,6 +64,7 @@ func parsePrometheusMetric(input string) (PrometheusMetric, error) {
 
 	if len(labelsMatches) != 2 || len(valueMatches) != 2 {
 		log.Error().Msg("告警标签缺失")
+		return metric, nil
 	}
 	labelsStr := labelsMatches[1]
 	valueStr := valueMatches[1]
@@ -80,8 +83,8 @@ func parsePrometheusMetric(input string) (PrometheusMetric, error) {
 }
 
 // 结构转换
-func Convert(ga GrafanaAlert) []*Alert {
-	result := []*Alert{}
+func Convert(ga GrafanaAlert) []Alert {
+	result := []Alert{}
 	for _, al := range ga.Alerts {
 		var metric, _ = parsePrometheusMetric(al.ValueString)
 		// 将时间戳转换为中国标准时间
@@ -91,7 +94,7 @@ func Convert(ga GrafanaAlert) []*Alert {
 		al.StartsTime = formattedTime
 		al.Metric = metric
 		al.HosrUrl = strings.ReplaceAll(ga.MessageObj.HosrUrl, " ", "")
-		result = append(result, &al)
+		result = append(result, al)
 	}
 	return result
 }

@@ -43,23 +43,23 @@ func InitializeConnectionPools() {
 	var config = alertinit.MysqlConf
 	connectionPools := NewMySQLConnectionPools()
 	for _, instance := range config.Instances {
-		if instance.Labels.Instance != "" {
+		if instance.Labels.Pod != "" {
 			db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/performance_schema", instance.Username, instance.Password, instance.Address))
 			if err != nil {
-				log.Error().Msgf("failed to open MySQL connection for instance '%s': %v", fmt.Sprintf("%s-%s", instance.Labels.Cluster, instance.Labels.Instance), err)
+				log.Error().Msgf("failed to open MySQL connection for instance '%s': %v", fmt.Sprintf("%s-%s", instance.Labels.Namespace, instance.Labels.Pod), err)
 			}
 			// 设置连接池最大连接数为 5
 			db.SetMaxOpenConns(5)
-			connectionPools.pools[fmt.Sprintf("%s-%s", instance.Labels.Cluster, instance.Labels.Instance)] = db
+			connectionPools.pools[fmt.Sprintf("%s-%s", instance.Labels.Namespace, instance.Labels.Pod)] = db
 		}
 	}
 	Pool = connectionPools
 }
 
-func GetSlowList(data *alertmodel.Alert) []*alertmodel.MysqlSlowLog {
-	slowList := []*alertmodel.MysqlSlowLog{}
-	cluster := data.Metric.Labels["cluster"]
-	instance := data.Metric.Labels["instance"]
+func GetSlowList(data alertmodel.Alert) []alertmodel.MysqlSlowLog {
+	slowList := []alertmodel.MysqlSlowLog{}
+	cluster := data.Metric.Labels["namespace"]
+	instance := data.Metric.Labels["pod"]
 	//不存在cluster和instance的话，就没法找到对应的数据库
 	// if !cexists || !iexists {
 	// 	return slowList
@@ -69,7 +69,7 @@ func GetSlowList(data *alertmodel.Alert) []*alertmodel.MysqlSlowLog {
 		log.Error().Msgf("Failed to get connection:%s", err)
 		return slowList
 	}
-	tm := data.StartsAt.Add(-(time.Duration(alertinit.Conf.MysqlSlowQuery.LongQueryTime)) * time.Minute)
+	tm := data.StartsAt.Add(-(time.Duration(alertinit.Conf.MysqlSlowQuery.RetrospectTime)) * time.Second)
 	formattedTime := tm.Format("2006-01-02 15:04:05")
 	sql := fmt.Sprintf("SELECT `SCHEMA_NAME` as 'db',`QUERY_SAMPLE_TIMER_WAIT` as 'query_time',`QUERY_SAMPLE_TEXT` as 'query',`LAST_SEEN` as 'last_query_time'FROM events_statements_summary_by_digest  where `QUERY_SAMPLE_TIMER_WAIT` > %d *1000000000000 AND `LAST_SEEN` > '%s' ORDER BY LAST_SEEN DESC", alertinit.Conf.MysqlSlowQuery.LongQueryTime, formattedTime)
 	logData := map[string]interface{}{
@@ -91,7 +91,7 @@ func GetSlowList(data *alertmodel.Alert) []*alertmodel.MysqlSlowLog {
 				log.Error().Msgf("Failed to scan row:%s", err)
 			} else {
 				slow.Instance = instance
-				slowList = append(slowList, &slow)
+				slowList = append(slowList, slow)
 			}
 		}
 	}

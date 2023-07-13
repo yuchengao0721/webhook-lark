@@ -1,8 +1,8 @@
 package alertmodel
 
 type Labels struct {
-	Cluster  string `toml:"cluster"`
-	Instance string `toml:"instance"`
+	Namespace string `toml:"namespace"`
+	Pod       string `toml:"pod"`
 }
 type Instance struct {
 	Address  string `toml:"address"`
