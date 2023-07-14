@@ -30,6 +30,19 @@ func main() {
 	// 接收logstash传输过来的日志信息
 	app.Post("/log/alert", func(c *fiber.Ctx) error {
 		log.Info().Msg("接收到一起报警")
+
+		data1 := new(interface{})
+		if err := c.BodyParser(data1); err != nil {
+			log.Err(err).Msg("接收到的日志格式好像不大对")
+			return c.SendString("true")
+		}
+		// 序列化为 JSON 字符串
+		jsonData1, err := json.Marshal(data1)
+		if err != nil {
+			log.Info().Err(err)
+		}
+		log.Info().Any("Grafana", jsonData1).Msg("Grafana")
+		fmt.Println(string(jsonData1))
 		// 判断是否是合格的告警日志格式
 		data := new(alertmodel.GrafanaAlert)
 		if err := c.BodyParser(data); err != nil {

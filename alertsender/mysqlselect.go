@@ -58,8 +58,8 @@ func InitializeConnectionPools() {
 
 func GetSlowList(data alertmodel.Alert) []alertmodel.MysqlSlowLog {
 	slowList := []alertmodel.MysqlSlowLog{}
-	cluster := data.Metric.Labels["namespace"]
-	instance := data.Metric.Labels["pod"]
+	cluster := data.Labels.Namespace
+	instance := data.Labels.Pod
 	//不存在cluster和instance的话，就没法找到对应的数据库
 	// if !cexists || !iexists {
 	// 	return slowList

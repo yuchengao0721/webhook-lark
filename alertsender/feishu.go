@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"edge-alert/alertinit"
 	"edge-alert/alertmodel"
-	"encoding/json"
 	"html/template"
 	"io/ioutil"
 
@@ -31,19 +30,8 @@ type FeishuSender struct{}
 
 // 飞书发送消息
 func (s *FeishuSender) SendMsg(alertData alertmodel.GrafanaAlert) bool {
-	var message alertmodel.Message
-	err := json.Unmarshal([]byte(alertData.Message), &message)
-	if err != nil {
-		fmt.Println("Error:", err)
-		log.Error().Msgf("Grafana通知媒介配置错误了？: %v", err)
-	}
-	alertData.MessageObj = message
 	//配置项里面的飞书token必填,或者填写grafana里面通知媒介里面Message内的fs_rebot_token值
 	fs_tokens := make(alertmodel.Set)
-	if strings.TrimSpace(alertData.MessageObj.FSRebotToken) != "" {
-		var arr = strings.Split(alertData.MessageObj.FSRebotToken, ",")
-		fs_tokens.AddArr(arr)
-	}
 	if strings.TrimSpace(alertinit.Conf.Alert.FSToken) != "" {
 		var arr = strings.Split(alertinit.Conf.Alert.FSToken, ",")
 		fs_tokens.AddArr(arr)
