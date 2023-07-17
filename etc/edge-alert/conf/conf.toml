@@ -5,7 +5,7 @@
 
 [alert_tokens]
     # 飞书通知的token，置空的话就走夜莺推送里面的token
-    feishu_rebot_token='36af9463-f523-461c-962c-18f2a01211d5,36af9463-f523-461c-962c-18f2a01211d5,36af9463-f523-461c-962c-18f2a01211d5'
+    feishu_rebot_token='038177b2-eb47-413b-92e3-27520ca33b0a'
 
 # 与grafana告警约束的tag标记
 [mysql_slow_query]

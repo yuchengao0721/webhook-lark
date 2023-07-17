@@ -28,7 +28,7 @@ func main() {
 		return c.SendString("true")
 	})
 	// 接收logstash传输过来的日志信息
-	app.Post("/log/alert", func(c *fiber.Ctx) error {
+	app.Post("/alert/alertmanager", func(c *fiber.Ctx) error {
 		log.Info().Msg("接收到一起报警")
 
 		data1 := new(interface{})

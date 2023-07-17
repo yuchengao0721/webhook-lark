@@ -5,6 +5,7 @@ import (
 	"edge-alert/alertinit"
 	"edge-alert/alertmodel"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -96,4 +97,20 @@ func GetSlowList(data alertmodel.Alert) []alertmodel.MysqlSlowLog {
 		}
 	}
 	return slowList
+}
+func parseMapString(text string) map[string]string {
+	result := make(map[string]string)
+	text = strings.Trim(text, "{}")
+	pairs := strings.Split(text, " ")
+
+	for _, pair := range pairs {
+		keyValue := strings.Split(pair, ":")
+		if len(keyValue) == 2 {
+			key := strings.Trim(keyValue[0], " ")
+			value := strings.Trim(keyValue[1], " ")
+			result[key] = value
+		}
+	}
+
+	return result
 }
